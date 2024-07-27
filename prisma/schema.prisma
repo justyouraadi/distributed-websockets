@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Message {
+  id           Int         @id @default(autoincrement())
+  room_id      String
+  message_type MessageType
+  message_from String
+  message      String
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+  seen         Boolean     @default(false)
+  Room         Room        @relation(fields: [room_id], references: [room_id])
+
+  @@index([id])
+  @@index([message])
+  @@index([room_id])
+}
+
+model Room {
+  id        Int       @id @default(autoincrement())
+  room_id   String    @unique
+  buyer_id  Int
+  seller_id Int
+  members   Int[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  status    Boolean   @default(true)
+  Message   Message[]
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  FILE
+  URL
+}
